@@ -58,22 +58,47 @@ body.noanim *,body.noanim:before{animation:none!important;transition:none!import
 @media(prefers-reduced-motion:reduce){*,body:before{animation:none!important;transition:none!important}}
 :focus-visible{outline:2px solid var(--red);outline-offset:2px}
 details summary{cursor:pointer;color:var(--red);margin-top:8px}.av{font-size:2.4rem}
-</style></head><body>
-<header><button id="burger" aria-label="Menu">☰</button><div class="logo">VALO<b>//</b>TRACK</div><div class="sp"></div><div class="st">SYSTÈME EN LIGNE</div><div class="pf" id="pf"></div></header>
+body.gate header,body.gate nav,body.gate main{display:none}#gate{padding:30px 16px;max-width:1100px;margin:0 auto}main a:not(.btn){color:var(--red)}</style></head><body>
+<header><button id="burger" aria-label="Menu">☰</button><div class="logo">VALO<b>//</b>TRACK</div><div class="sp"></div><div class="st">SYSTÈME EN LIGNE</div><div class="pf" id="pf"></div><button class="gh" id="sw" aria-label="Changer de profil" style="min-height:36px;padding:6px 12px">⇄ Profils</button></header>
 <nav id="nav"></nav><main id="main"></main>
 <script>
+/* Profils : liste visible par tous, accès par mot de passe (verrou local, stocké dans ce navigateur) */
+const GL=(k,d)=>{try{return JSON.parse(localStorage.getItem(PFX+k))??d}catch(e){return d}},GW=(k,v)=>localStorage.setItem(PFX+k,JSON.stringify(v));
+const gesc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function hpw(t){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('valotrack:'+t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of 'valotrack:'+t)h=(h*33^c.charCodeAt(0))>>>0;return'x'+h}}
+(function(){if(GL('profiles',null)===null){const l=[];if(localStorage.getItem('vt_m')!==null){['p','m','a','d','s','sn','mn','demo'].forEach(k=>{const v=localStorage.getItem('vt_'+k);if(v!==null){localStorage.setItem('vt_p0_'+k,v);localStorage.removeItem('vt_'+k)}});const q=JSON.parse(localStorage.getItem('vt_p0_p')||'{}');l.push({id:'p0',name:q.name||'JOUEUR',av:q.avatar||'🎯',pw:''})}GW('profiles',l)}})();
+const PL=GL('profiles',[]);let SESS=sessionStorage.getItem('vt_sess');if(!PL.some(x=>x.id===SESS))SESS=null;
+const PFX='vt_'+SESS+'_',PROF=PL.find(x=>x.id===SESS)||{};
+function enter(id){sessionStorage.setItem('vt_sess',id);location.reload()}
+function showGate(){document.body.classList.add('gate');const g=document.createElement('div');g.id='gate';document.body.appendChild(g);
+ const draw=()=>{const l=GL('profiles',[]),rk=id=>{try{return JSON.parse(localStorage.getItem('vt_'+id+'_p')).rank||''}catch(e){return ''}};
+  g.innerHTML=`<div class="logo" style="font-size:2rem;text-align:center">VALO<b>//</b>TRACK</div><h1 style="text-align:center;margin:12px 0">Choisis ton profil</h1><div class="grid">${l.map(p=>`<div class="card"><span class="av">${p.av||'🎯'}</span><h3>${gesc(p.name)}</h3><small>${gesc(rk(p.id))} · ${p.pw?'🔒 Mot de passe requis':'Sans mot de passe'}</small><div style="margin-top:10px"><label for="pw_${p.id}">Mot de passe</label><input id="pw_${p.id}" type="password" ${p.pw?'':'disabled placeholder="Aucun"'}><p id="er_${p.id}" role="alert" style="color:var(--red);min-height:1.3em"></p><button data-in="${p.id}">Entrer</button></div></div>`).join('')||'<p style="text-align:center;color:var(--mu)">Aucun profil pour le moment.</p>'}</div><div class="card" style="max-width:420px;margin:18px auto"><h3>Créer un profil</h3><label for="n_name">Pseudo</label><input id="n_name" maxlength="20"><label for="n_pw">Mot de passe (4 caractères minimum)</label><input id="n_pw" type="password"><p id="n_er" role="alert" style="color:var(--red);min-height:1.3em"></p><button id="n_go">Créer et entrer</button></div>`;
+  g.querySelectorAll('[data-in]').forEach(b=>b.onclick=async()=>{const p=l.find(x=>x.id===b.dataset.in);if(p.pw&&await hpw(g.querySelector('#pw_'+p.id).value)!==p.pw){g.querySelector('#er_'+p.id).textContent='Mot de passe incorrect.';return}enter(p.id)});
+  g.querySelector('#n_go').onclick=async()=>{const nm=g.querySelector('#n_name').value.trim(),pw=g.querySelector('#n_pw').value,er=g.querySelector('#n_er');
+   if(!nm)return er.textContent='Saisis un pseudo.';
+   if(l.some(x=>x.name.toLowerCase()===nm.toLowerCase()))return er.textContent='Ce pseudo existe déjà.';
+   if(pw.length<4)return er.textContent='Mot de passe trop court (4 caractères minimum).';
+   const id='p'+Date.now().toString(36),pre='vt_'+id+'_';l.push({id,name:nm,av:'🎯',pw:await hpw(pw)});GW('profiles',l);
+   localStorage.setItem(pre+'p',JSON.stringify({rank:'Iron 1',best:'Iron 1',goal:'Bronze 1',kd:0,wr:0,hs:0,acs:0,games:0,agent:'Jett',name:nm,avatar:'🎯'}));
+   localStorage.setItem(pre+'m','[]');localStorage.setItem(pre+'demo','false');enter(id)}};
+ draw()}
+if(!SESS)showGate();
+</script>
+<script>
+if(SESS){
 const $=s=>document.querySelector(s),
 L=(k,d)=>{try{return JSON.parse(localStorage.getItem('vt_'+k))??d}catch(e){return d}},
 W=(k,v)=>localStorage.setItem('vt_'+k,JSON.stringify(v)),
 esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const R=[];['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal'].forEach(n=>[1,2,3].forEach(i=>R.push(n+' '+i)));R.push('Radiant');
 const MAPS=['Ascent','Bind','Haven','Split','Icebox','Breeze','Fracture','Pearl','Lotus','Sunset','Abyss'],
-AG=['Jett','Reyna','Phoenix','Raze','Neon','Yoru','Iso','Sage','Skye','Killjoy','Cypher','Sova','Fade','Gekko','Breach','Omen','Brimstone','Viper','Astra','Harbor','Clove','Chamber','Vyse','Tejo','Waylay','Deadlock'];
-let DEMO=L('demo',localStorage.getItem('vt_m')===null),P=L('p',{rank:'Platinum 2',best:'Platinum 2',goal:'Diamond 1',kd:1.18,wr:57,hs:24,acs:238,games:0,agent:'Jett'}),
-M=L('m',demo()),A=L('a',{best:{},prec:0,rt:0,hist:[]}),D=L('d',{}),SES=L('s',null),charts=[],G=null,tm=null;if(DEMO&&localStorage.getItem('vt_m')===null){W('m',M);W('demo',true)}
+AG=['Jett','Reyna','Phoenix','Raze','Neon','Yoru','Iso','Sage','Skye','Killjoy','Cypher','Sova','Fade','Gekko','Breach','Omen','Brimstone','Viper','Astra','Harbor','Clove','Miks','Chamber','Vyse','Tejo','Waylay','Deadlock','Veto','Kay/O'];
+let DEMO=L('demo',localStorage.getItem(PFX+'m')===null),P=L('p',{rank:'Platinum 2',best:'Platinum 2',goal:'Diamond 1',kd:1.18,wr:57,hs:24,acs:238,games:0,agent:'Jett'}),
+M=L('m',demo()),A=L('a',{best:{},prec:0,rt:0,hist:[]}),D=L('d',{}),SES=L('s',null),charts=[],G=null,tm=null;P.name=P.name||PROF.name||'JOUEUR';if(DEMO&&localStorage.getItem(PFX+'m')===null){W('m',M);W('demo',true)}
 const avg=(a,k)=>a.length?a.reduce((s,x)=>s+ +x[k],0)/a.length:0;
-const N=[['dash','Dashboard'],['aim','Aim Trainer'],['stats','Mes statistiques'],['analyse','Analyse'],['coach','Coach'],['maps','Maps'],['agents','Agents'],['sens','Sensibilité'],['train','Entraînement'],['mis','Missions'],['rand','Random'],['prof','Profil'],['cfg','Paramètres']];
+const N=[['dash','Dashboard'],['aim','Aim Trainer'],['stats','Mes statistiques'],['analyse','Analyse'],['coach','Coach'],['maps','Maps'],['agents','Agents'],['sens','Sensibilité'],['train','Entraînement'],['prof','Profil'],['cfg','Paramètres']];
 $('#nav').innerHTML=N.map(n=>`<a href="#${n[0]}" data-v="${n[0]}">${n[1]}</a>`).join('');
+$('#sw').onclick=()=>{sessionStorage.removeItem('vt_sess');location.reload()};
 $('#burger').onclick=()=>$('#nav').classList.toggle('open');
 const opts=(a,v)=>a.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('');
 function count(){document.querySelectorAll('[data-n]').forEach(e=>{const n=+e.dataset.n,d=+e.dataset.d||0,s=e.dataset.s||'',t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/900);e.textContent=(n*(1-Math.pow(1-p,3))).toFixed(d)+s;if(p<1)requestAnimationFrame(f)})(t0)});setTimeout(()=>document.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%'),60)}
@@ -174,13 +199,16 @@ function bindTrain(){$('#tgen').onclick=()=>{const dur=+$('#t_dur').value,n=Math
 const V={dash:[viewDash,bindDash],aim:[viewAim,bindAim],stats:[viewStats,bindStats],analyse:[viewAnalyse],coach:[viewCoach,()=>document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{cs=b.dataset.c;go('coach',true)})],train:[viewTrain,bindTrain]};
 /* ---------- OUTILS UI : réglages, toasts, modales ---------- */
 const $$=s=>document.querySelectorAll(s);
-let S=L('st',{theme:'dark',anim:true,snd:false});
+let S=GL('st',{theme:'dark',anim:true,snd:false});
 function applyS(){document.body.classList.toggle('light',S.theme==='light');document.body.classList.toggle('noanim',!S.anim)}applyS();
 function beep(){if(!S.snd)return;try{const c=new AudioContext(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=660;g.gain.value=.05;o.start();o.stop(c.currentTime+.08)}catch(e){}}
 function toast(m){const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=m;document.body.appendChild(t);beep();setTimeout(()=>t.remove(),2600)}
 function modal(m,fn){const o=document.createElement('div');o.className='ov';o.innerHTML=`<div class="card" role="dialog" aria-modal="true"><p>${m}</p><br><button id="mo">Confirmer</button> <button class="gh" id="mc">Annuler</button></div>`;document.body.appendChild(o);$('#mc').onclick=()=>o.remove();$('#mo').onclick=()=>{o.remove();fn()};$('#mo').focus()}
 function wipe(){Object.keys(localStorage).filter(k=>k.startsWith('vt_')).forEach(k=>localStorage.removeItem(k))}
-function own(){wipe();W('m',[]);W('demo',false);location.reload()}
+function mine(){Object.keys(localStorage).filter(k=>k.startsWith(PFX)).forEach(k=>localStorage.removeItem(k))}
+function own(){mine();W('p',{rank:'Iron 1',best:'Iron 1',goal:'Bronze 1',kd:0,wr:0,hs:0,acs:0,games:0,agent:'Jett',name:PROF.name,avatar:P.avatar});W('m',[]);W('demo',false);location.reload()}
+function delProf(){mine();GW('profiles',GL('profiles',[]).filter(x=>x.id!==SESS));sessionStorage.removeItem('vt_sess');location.reload()}
+function syncProf(){const pl=GL('profiles',[]),me=pl.find(x=>x.id===SESS);if(me){me.name=P.name||me.name;me.av=P.avatar||me.av;GW('profiles',pl)}}
 function demo(){const a=['Jett','Omen','Sage'],m=['Ascent','Bind','Haven','Split'];return Array.from({length:8},(_,i)=>({date:'2026-09-'+String(10+i*2).padStart(2,'0'),map:m[i%4],agent:a[i%3],win:i%3!==2,k:14+(i*3)%9,d:11+(i*5)%7,a:4+i%5,acs:215+i*6,hs:20+i%6,sc:i%3!==2?'13-9':'8-13',c:'Démo'}))}
 function tp(){const e=$('#pct');if(!e||!SES)return;const p=Math.round(SES.ex.filter((_,i)=>D['s:'+i]).length/SES.ex.length*100),b=$('#pbar');e.textContent=p+' % terminé';b.dataset.w=p;b.style.width=p+'%'}
 /* ---------- SENSIBILITÉ ---------- */
@@ -192,8 +220,8 @@ function bindSens(){const up=()=>{const d=+$('#s_d').value,s=+$('#s_s').value,l=
 /* ---------- MAPS (images/lineups : ajouter les champs img et lineups dans MP) ---------- */
 let MN=L('mn',{}),mf='Toutes';
 const MP=[['Ascent','A, B','Mid avec portes que l\'on peut fermer.'],['Bind','A, B','Deux téléporteurs à sens unique, pas de mid.'],['Haven','A, B, C','Trois sites à défendre.'],['Split','A, B','Mid vertical avec des cordes.'],['Lotus','A, B, C','Trois sites, portes tournantes, murs destructibles.'],['Sunset','A, B','Deux sites autour d\'un mid contrôlable.'],['Icebox','A, B','Forte verticalité, tyroliennes.'],['Breeze','A, B','Grands espaces, duels longue portée.'],['Abyss','A, B','Bords sans garde-corps : attention aux chutes.'],['Pearl','A, B','Deux sites, sans gadget particulier.'],['Fracture','A, B','Les attaquants arrivent des deux côtés.']];
-const MT={Attaque:'Prends de l\'info, crée de l\'espace, puis engage avec utilités.',Défense:'Varie tes positions et garde un repli pour le retake.',Lineups:'Note tes lineups dans la zone de notes de la carte.',Smokes:'Coupe les angles dangereux et la vue longue portée.',Flashs:'Flashe pour ton coéquipier et swing juste après.'};
-function viewMaps(){return head('Maps','Explore les maps et garde tes callouts et lineups dans tes notes.')+`<div class="chips" style="margin:14px 0">${['Toutes',...Object.keys(MT)].map(f=>`<button class="gh ${f==mf?'on':''}" data-f="${f}" aria-pressed="${f==mf}">${f}</button>`).join('')}</div><div class="grid g2">${MP.map(m=>`<div class="card"><h2>${m[0]}</h2><p>${m[2]}</p><p><b>Sites :</b> ${m[1]}</p>${mf=='Toutes'?`<p><b>Attaque :</b> ${MT.Attaque}</p><p><b>Défense :</b> ${MT.Défense}</p>`:`<p><b>${mf} :</b> ${MT[mf]}</p>`}<label for="n_${m[0]}">Mes callouts / lineups</label><textarea id="n_${m[0]}" data-n="${m[0]}" rows="3">${esc(MN[m[0]]||'')}</textarea></div>`).join('')}</div>`}
+const MT={Attaque:'Prends de l\'info, crée de l\'espace, puis engage avec utilités.',Défense:'Varie tes positions et garde un repli pour le retake.',Lineups:'Consulte lineupsvalorant.com et note tes préférés dans la zone de notes.',Smokes:'Coupe les angles dangereux et la vue longue portée.',Flashs:'Flashe pour ton coéquipier et swing juste après.'};
+function viewMaps(){return head('Maps','Explore les maps et garde tes callouts et lineups dans tes notes.')+`<p style="margin-top:12px"><a class="btn" style="display:inline-block;text-decoration:none" href="https://lineupsvalorant.com/" target="_blank" rel="noopener noreferrer">Voir les lineups sur lineupsvalorant.com ↗</a></p>`+`<div class="chips" style="margin:14px 0">${['Toutes',...Object.keys(MT)].map(f=>`<button class="gh ${f==mf?'on':''}" data-f="${f}" aria-pressed="${f==mf}">${f}</button>`).join('')}</div><div class="grid g2">${MP.map(m=>`<div class="card"><h2>${m[0]}</h2><p>${m[2]}</p><p><b>Sites :</b> ${m[1]}</p>${mf=='Toutes'?`<p><b>Attaque :</b> ${MT.Attaque}</p><p><b>Défense :</b> ${MT.Défense}</p>`:`<p><b>${mf} :</b> ${MT[mf]}</p>${mf=='Lineups'?'<p><a href="https://lineupsvalorant.com/" target="_blank" rel="noopener noreferrer">lineupsvalorant.com ↗</a></p>':''}`}<label for="n_${m[0]}">Mes callouts / lineups</label><textarea id="n_${m[0]}" data-n="${m[0]}" rows="3">${esc(MN[m[0]]||'')}</textarea></div>`).join('')}</div>`}
 function bindMaps(){$$('[data-f]').forEach(b=>b.onclick=()=>{mf=b.dataset.f;go('maps',true)});$$('[data-n]').forEach(t=>t.onchange=()=>{MN[t.dataset.n]=t.value;W('mn',MN);toast('Notes enregistrées')})}
 /* ---------- AGENTS ---------- */
 const AGS=`Jett|Duelist|Cloudburst, Updraft, Tailwind, Blade Storm
@@ -217,38 +245,31 @@ Viper|Controller|Snake Bite, Poison Cloud, Toxic Screen, Viper's Pit
 Astra|Controller|Nova Pulse, Nebula, Gravity Well, Cosmic Divide
 Harbor|Controller|Cascade, Cove, High Tide, Reckoning
 Clove|Controller|Pick-me-up, Meddle, Ruse, Not Dead Yet
+Miks|Controller|Harmonize, M-Pulse, Waveform, Bassquake
 Sage|Sentinel|Slow Orb, Healing Orb, Barrier Orb, Resurrection
 Cypher|Sentinel|Trapwire, Cyber Cage, Spycam, Neural Theft
 Killjoy|Sentinel|Alarmbot, Turret, Nanoswarm, Lockdown
 Chamber|Sentinel|Trademark, Headhunter, Rendezvous, Tour de Force
 Deadlock|Sentinel|GravNet, Sonic Sensor, Barrier Mesh, Annihilation
-Vyse|Sentinel|Razorvine, Shear, Arc Rose, Steel Garden`.split('\n').map(l=>l.split('|'));
+Vyse|Sentinel|Razorvine, Shear, Arc Rose, Steel Garden
+Veto|Sentinel|Crosscut, Chokehold, Interceptor, Evolution`.split('\n').map(l=>l.split('|'));
 const RI={Duelist:['Ouvre les sites et crée de l\'espace.','Impact en entry, potentiel de frags.','Dépend des flashs et des trades.','Entre en second avec un coéquipier, pas seul.'],Initiator:['Récolte l\'info et prépare l\'entrée.','Utilités qui facilitent les duels.','Peu de soin et d\'autonomie.','Utilise tes capacités juste avant l\'engagement.'],Controller:['Contrôle la vision avec des écrans.','Découpe les angles, gère le rythme.','Moins de frags directs.','Place tes écrans tôt et reste avec l\'équipe.'],Sentinel:['Verrouille un site et protège les flancs.','Info passive, bon en défense.','Moins mobile en attaque.','Change tes installations d\'un round à l\'autre.']};
 let ar='Tous',aq='';
 function viewAgents(){const l=AGS.filter(a=>(ar=='Tous'||a[1]==ar)&&a[0].toLowerCase().includes(aq.toLowerCase()));return head('Agents','Fiches, compétences et conseils par rôle.')+`<div class="chips" style="margin:14px 0">${['Tous',...Object.keys(RI)].map(r=>`<button class="gh ${r==ar?'on':''}" data-r="${r}" aria-pressed="${r==ar}">${r}</button>`).join('')}</div><label for="aq">Rechercher un agent...</label><input id="aq" placeholder="Rechercher un agent..." value="${esc(aq)}"><div class="grid">${l.map(a=>{const r=RI[a[1]];return `<div class="card"><h3>${a[0]}</h3><small>${a[1]}</small><p style="margin:8px 0"><b>Compétences :</b> ${a[2]}</p><details><summary>Détails</summary><p><b>Style :</b> ${r[0]}</p><p><b>Forces :</b> ${r[1]}</p><p><b>Faiblesses :</b> ${r[2]}</p><p><b>Conseil :</b> ${r[3]}</p></details></div>`}).join('')||'<p>Aucun agent trouvé.</p>'}</div>`}
 function bindAgents(){$$('[data-r]').forEach(b=>b.onclick=()=>{ar=b.dataset.r;go('agents',true)});$('#aq').oninput=e=>{aq=e.target.value;const p=e.target.selectionStart;go('agents',true);const i=$('#aq');i.focus();i.setSelectionRange(p,p)}}
-/* ---------- MISSIONS ---------- */
-let Q=L('q',{xp:0,done:{}});const MI=[['Faire 2 Deathmatch',100],['Faire 20 minutes d\'Aim Trainer',150],['Jouer 3 parties',200],['Ajouter 3 parties au tracker',150],['Faire une session d\'entraînement',120],['Améliorer son record d\'Aim Trainer',250],['Faire une VOD review',150]];
-function viewMis(){const lv=Math.floor(Q.xp/2000)+1,x=Q.xp%2000;return head('Missions','Valide tes missions pour gagner de l\'XP.')+`<div class="card" style="margin:14px 0"><h2>Niveau ${lv}</h2><p>${x} / 2000 XP</p>${bar(x/20)}</div><div class="card">${MI.map((m,i)=>`<div class="ex" style="justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)"><span>${Q.done[i]?'✔ ':''}${m[0]} <b style="color:var(--red)">+${m[1]} XP</b></span><button class="gh" data-q="${i}" ${Q.done[i]?'disabled':''}>${Q.done[i]?'Fait':'Valider'}</button></div>`).join('')}<br><button class="gh" id="qr">Nouvelle journée</button></div>`}
-function bindMis(){$$('[data-q]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q,l=Math.floor(Q.xp/2000);Q.done[i]=1;Q.xp+=MI[i][1];W('q',Q);toast('+'+MI[i][1]+' XP');if(Math.floor(Q.xp/2000)>l)toast('Niveau '+(l+2)+' débloqué !');go('mis',true)});$('#qr').onclick=()=>{Q.done={};W('q',Q);go('mis',true)}}
-/* ---------- RANDOM ---------- */
-const DF=['Faire 10 kills avec une arme secondaire','Faire 3 kills en headshot dans un round','Gagner un round sans utiliser de capacité offensive','Faire une partie avec un agent différent','Ne jamais courir en tirant pendant une partie','Faire un round en utilisant uniquement le couteau pour te déplacer','Annoncer toutes les infos à ton équipe pendant 3 rounds','Gagner un pistol round'];
-function spin(list,el){let n=0;const t=setInterval(()=>{el.textContent=list[Math.random()*list.length|0];if(++n>16){clearInterval(t);toast('Tirage : '+el.textContent)}},70)}
-function viewRand(){return head('Random','Laisse le hasard décider.')+`<div class="grid g2" style="margin-top:14px"><div class="card"><h3>Random agent</h3><p style="font-size:1.4rem">Ton agent</p><p class="v" style="color:var(--red)" id="ra" aria-live="polite">—</p><button id="rab">Choisir un agent</button></div><div class="card"><h3>Random map</h3><p style="font-size:1.4rem">Ta map</p><p class="v" style="color:var(--red)" id="rm" aria-live="polite">—</p><button id="rmb">Choisir une map</button></div><div class="card"><h3>Défi du jour</h3><p class="v" style="font-size:1.2rem" id="rd">${DF[new Date().getDate()%DF.length]}</p><button id="rdb">Nouveau défi</button></div></div>`}
-function bindRand(){$('#rab').onclick=()=>spin(AGS.map(a=>a[0]),$('#ra'));$('#rmb').onclick=()=>spin(MP.map(m=>m[0]),$('#rm'));$('#rdb').onclick=()=>{$('#rd').textContent=DF[Math.random()*DF.length|0]}}
 /* ---------- PROFIL ---------- */
 const AVS=['🎯','🔥','⚡','🛡️','👑','🐺'];
 function viewProf(){const av=P.avatar||AVS[0];return head('Profil')+`<div class="grid g2" style="margin-top:14px"><div class="card"><h3>Informations</h3><div class="f"><div><label for="q_name">Pseudo</label><input id="q_name" value="${esc(P.name||'JOUEUR')}" maxlength="20"></div><div><label for="q_rank">Rang</label><select id="q_rank">${opts(R,P.rank)}</select></div><div><label for="q_goal">Objectif</label><select id="q_goal">${opts(R,P.goal)}</select></div><div><label for="q_agent">Agent principal</label><select id="q_agent">${opts(AG,P.agent)}</select></div><div><label for="q_role">Rôle principal</label><select id="q_role">${opts(Object.keys(RI),P.role||'Duelist')}</select></div><div><label for="q_dpi">DPI</label><input id="q_dpi" type="number" value="${P.dpi||800}"></div><div><label for="q_sens">Sensibilité</label><input id="q_sens" type="number" step="0.01" value="${P.sens||0.35}"></div></div><p>Avatar</p><div class="chips">${AVS.map(a=>`<button class="gh av ${a==av?'on':''}" data-av="${a}" aria-label="Avatar ${a}" aria-pressed="${a==av}">${a}</button>`).join('')}</div><br><button id="qsave">Enregistrer</button></div>
 <div class="card"><span class="av">${av}</span><pre class="res">${esc((P.name||'JOUEUR').toUpperCase())}\n\n${P.rank}\n\nObjectif :\n${P.goal}\n\nMain :\n${P.agent}\n\nK/D :\n${P.kd}\n\nHS :\n${P.hs} %</pre></div></div>`}
-function bindProf(){$$('[data-av]').forEach(b=>b.onclick=()=>{P.avatar=b.dataset.av;W('p',P);go('prof',true)});$('#qsave').onclick=()=>{['name','rank','goal','agent','role'].forEach(k=>P[k]=$('#q_'+k).value.trim()||P[k]);P.dpi=+$('#q_dpi').value||800;P.sens=+$('#q_sens').value||0.35;W('p',P);toast('Profil enregistré');go('prof',true)}}
+function bindProf(){$$('[data-av]').forEach(b=>b.onclick=()=>{P.avatar=b.dataset.av;W('p',P);syncProf();go('prof',true)});$('#qsave').onclick=()=>{['name','rank','goal','agent','role'].forEach(k=>P[k]=$('#q_'+k).value.trim()||P[k]);P.dpi=+$('#q_dpi').value||800;P.sens=+$('#q_sens').value||0.35;W('p',P);syncProf();toast('Profil enregistré');go('prof',true)}}
 /* ---------- PARAMÈTRES ---------- */
 function viewCfg(){const cb=(k,l,on)=>`<label class="ex" style="display:flex;padding:8px 0;text-transform:none;font-size:1rem;color:var(--tx)"><input type="checkbox" data-s="${k}" ${on?'checked':''}>${l}</label>`;return head('Paramètres')+`<div class="card" style="margin-top:14px"><h3>Affichage</h3>${cb('theme','Thème clair',S.theme==='light')}${cb('anim','Animations',S.anim)}${cb('snd','Sons',S.snd)}<small>Les animations sont aussi désactivées si ton système demande de les réduire.</small></div>
-<div class="card" style="margin-top:14px"><h3>Données</h3><button id="cx">Exporter mes données</button> <button class="gh" id="ci">Importer mes données</button> <button class="gh" id="cr">Réinitialiser mes données</button><input type="file" id="imp" accept=".json" hidden aria-label="Fichier JSON à importer"></div>`}
-function bindCfg(){$$('[data-s]').forEach(c=>c.onchange=()=>{const k=c.dataset.s;if(k=='theme')S.theme=c.checked?'light':'dark';else S[k]=c.checked;W('st',S);applyS();toast('Réglage enregistré')});
+<div class="card" style="margin-top:14px"><h3>Données</h3><button id="cx">Exporter mes données</button> <button class="gh" id="ci">Importer mes données</button> <button class="gh" id="cr">Réinitialiser mes données</button> <button class="gh" id="cd">Supprimer ce profil</button><input type="file" id="imp" accept=".json" hidden aria-label="Fichier JSON à importer"></div>`}
+function bindCfg(){$$('[data-s]').forEach(c=>c.onchange=()=>{const k=c.dataset.s;if(k=='theme')S.theme=c.checked?'light':'dark';else S[k]=c.checked;GW('st',S);applyS();toast('Réglage enregistré')});
  $('#cx').onclick=()=>{const o={};Object.keys(localStorage).filter(k=>k.startsWith('vt_')).forEach(k=>o[k]=localStorage.getItem(k));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download='valotrack-export.json';a.click();toast('Export téléchargé')};
- $('#ci').onclick=()=>$('#imp').click();$('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||typeof o!='object')throw 0;wipe();Object.entries(o).forEach(([k,v])=>{if(k.startsWith('vt_'))localStorage.setItem(k,String(v))});W('demo',false);location.reload()}catch(x){toast('Fichier invalide')}};r.readAsText(f)};
- $('#cr').onclick=()=>modal('Supprimer toutes tes données ? Cette action est définitive.',own)}
-Object.assign(V,{maps:[viewMaps,bindMaps],agents:[viewAgents,bindAgents],sens:[viewSens,bindSens],mis:[viewMis,bindMis],rand:[viewRand,bindRand],prof:[viewProf,bindProf],cfg:[viewCfg,bindCfg]});
+ $('#ci').onclick=()=>$('#imp').click();$('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||typeof o!='object')throw 0;wipe();Object.entries(o).forEach(([k,v])=>{if(k.startsWith('vt_'))localStorage.setItem(k,String(v))});location.reload()}catch(x){toast('Fichier invalide')}};r.readAsText(f)};
+ $('#cr').onclick=()=>modal('Réinitialiser les données de ce profil ? Cette action est définitive.',own);$('#cd').onclick=()=>modal('Supprimer définitivement ce profil et toutes ses données ?',delProf)}
+Object.assign(V,{maps:[viewMaps,bindMaps],agents:[viewAgents,bindAgents],sens:[viewSens,bindSens],prof:[viewProf,bindProf],cfg:[viewCfg,bindCfg]});
 
 let cur='dash';
 function go(v,keep){if(!V[v])v='dash';if(G&&!keep){clearInterval(tm);clearTimeout(G.to);G=null}cur=v;charts.forEach(c=>c.destroy());charts=[];
@@ -259,5 +280,8 @@ function go(v,keep){if(!V[v])v='dash';if(G&&!keep){clearInterval(tm);clearTimeou
  document.querySelectorAll('[data-k]').forEach(c=>c.onchange=()=>{D[c.dataset.k]=c.checked;W('d',D);c.closest('.ex').classList.toggle('d',c.checked);tp()});
  document.querySelectorAll('[data-k]').forEach(c=>c.closest('.ex').classList.toggle('d',c.checked));count();if(location.hash!=='#'+v)history.replaceState(null,'','#'+v)}
 addEventListener('hashchange',()=>go(location.hash.slice(1)));
+go(location.hash.slice(1)||'dash');
+}
+</script></body></html>
 go(location.hash.slice(1)||'dash');
 </script></body></html>
