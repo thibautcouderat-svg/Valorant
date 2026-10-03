@@ -63,7 +63,7 @@ body.gate header,body.gate nav,body.gate main{display:none}#gate{padding:30px 16
 <nav id="nav"></nav><main id="main"></main>
 <script>
 /* Profils : liste visible par tous, accès par mot de passe (verrou local, stocké dans ce navigateur) */
-const GL=(k,d)=>{try{return JSON.parse(localStorage.getItem(PFX+k))??d}catch(e){return d}},GW=(k,v)=>localStorage.setItem(PFX+k,JSON.stringify(v));
+const GL=(k,d)=>{try{return JSON.parse(localStorage.getItem('vt_'+k))??d}catch(e){return d}},GW=(k,v)=>localStorage.setItem('vt_'+k,JSON.stringify(v));
 const gesc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 async function hpw(t){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('valotrack:'+t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let h=5381;for(const c of 'valotrack:'+t)h=(h*33^c.charCodeAt(0))>>>0;return'x'+h}}
 (function(){if(GL('profiles',null)===null){const l=[];if(localStorage.getItem('vt_m')!==null){['p','m','a','d','s','sn','mn','demo'].forEach(k=>{const v=localStorage.getItem('vt_'+k);if(v!==null){localStorage.setItem('vt_p0_'+k,v);localStorage.removeItem('vt_'+k)}});const q=JSON.parse(localStorage.getItem('vt_p0_p')||'{}');l.push({id:'p0',name:q.name||'JOUEUR',av:q.avatar||'🎯',pw:''})}GW('profiles',l)}})();
@@ -87,8 +87,8 @@ if(!SESS)showGate();
 <script>
 if(SESS){
 const $=s=>document.querySelector(s),
-L=(k,d)=>{try{return JSON.parse(localStorage.getItem('vt_'+k))??d}catch(e){return d}},
-W=(k,v)=>localStorage.setItem('vt_'+k,JSON.stringify(v)),
+L=(k,d)=>{try{return JSON.parse(localStorage.getItem(PFX+k))??d}catch(e){return d}},
+W=(k,v)=>localStorage.setItem(PFX+k,JSON.stringify(v)),
 esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const R=[];['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal'].forEach(n=>[1,2,3].forEach(i=>R.push(n+' '+i)));R.push('Radiant');
 const MAPS=['Ascent','Bind','Haven','Split','Icebox','Breeze','Fracture','Pearl','Lotus','Sunset','Abyss'],
@@ -282,6 +282,4 @@ function go(v,keep){if(!V[v])v='dash';if(G&&!keep){clearInterval(tm);clearTimeou
 addEventListener('hashchange',()=>go(location.hash.slice(1)));
 go(location.hash.slice(1)||'dash');
 }
-</script></body></html>
-go(location.hash.slice(1)||'dash');
 </script></body></html>
