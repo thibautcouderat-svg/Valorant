@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VALO//TRACK</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#07070a;--card:#101016;--card2:#161620;--red:#ff2d4a;--red2:#8f0f24;--tx:#ecedf2;--mu:#8b8d9a;--ok:#35d49a;--bd:#2a2a38}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,Segoe UI,Roboto,sans-serif;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 400px at 80% 0,#ff2d4a22,transparent),radial-gradient(500px 400px at 0 100%,#8f0f2430,transparent);animation:bg 12s ease-in-out infinite alternate}
+@keyframes bg{to{transform:scale(1.15) translate(-2%,2%)}}
+@keyframes in{from{opacity:0;transform:translateY(14px)}}
+h1,h2,h3{letter-spacing:.06em;text-transform:uppercase}
+.logo{font-weight:900;font-size:1.3rem;letter-spacing:.12em}.logo b{color:var(--red)}
+header{position:fixed;top:0;left:0;right:0;height:58px;display:flex;align-items:center;gap:14px;padding:0 18px;background:#0a0a0fe6;backdrop-filter:blur(8px);border-bottom:1px solid var(--bd);z-index:20}
+header .sp{flex:1}.st{font-size:.8rem;color:var(--mu)}.st:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);margin-right:6px}
+.pf{background:var(--card2);border:1px solid var(--bd);padding:6px 12px;border-radius:20px;font-size:.85rem}
+#burger{display:none;background:none;border:0;color:var(--tx);font-size:1.6rem;cursor:pointer}
+nav{position:fixed;top:58px;left:0;bottom:0;width:220px;padding:16px 10px;background:#0a0a0f;border-right:1px solid var(--bd);z-index:15;transition:transform .25s}
+nav a{display:block;padding:12px 14px;margin-bottom:4px;border-radius:8px;color:var(--mu);text-decoration:none;font-weight:600;font-size:.9rem;border-left:3px solid transparent;transition:.2s}
+nav a:hover{color:var(--tx);background:var(--card2)}
+nav a.on{color:#fff;background:linear-gradient(90deg,#ff2d4a33,transparent);border-left-color:var(--red)}
+main{margin:58px 0 0 220px;padding:26px;max-width:1200px}
+section{animation:in .5s both}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin:18px 0}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--bd);border-radius:12px;padding:16px;transition:.25s;position:relative}
+.card:hover{border-color:var(--red);box-shadow:0 0 22px #ff2d4a33;transform:translateY(-3px)}
+.card small{color:var(--mu);text-transform:uppercase;letter-spacing:.1em;font-size:.7rem}
+.card .v{font-size:1.9rem;font-weight:800;margin-top:6px}
+.bar{height:10px;background:#1d1d29;border-radius:6px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red2),var(--red));box-shadow:0 0 12px var(--red);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+button,.btn{background:var(--red);color:#fff;border:0;padding:11px 18px;border-radius:8px;font-weight:700;letter-spacing:.06em;cursor:pointer;text-transform:uppercase;transition:.2s}
+button:hover{filter:brightness(1.2);box-shadow:0 0 16px var(--red)}
+button.gh{background:var(--card2);border:1px solid var(--bd)}button.gh.on{border-color:var(--red);color:var(--red)}
+input,select,textarea{width:100%;background:#0b0b11;color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:9px;font:inherit}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--red)}
+label{font-size:.75rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em}
+.f{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin:12px 0}
+ul.l{list-style:none;padding:0}ul.l li{padding:8px 0;border-bottom:1px solid var(--bd);font-size:.92rem}
+.good li:before{content:"▲ ";color:var(--ok)}.bad li:before{content:"▼ ";color:var(--red)}
+#arena{position:relative;height:380px;background:#08080d;border:1px solid var(--red2);border-radius:12px;overflow:hidden;cursor:crosshair;user-select:none;margin:12px 0;box-shadow:inset 0 0 40px #ff2d4a14}
+.tg{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff 0 18%,var(--red) 20% 55%,#fff 57% 62%,var(--red) 64%);box-shadow:0 0 16px var(--red);animation:pop .15s}
+@keyframes pop{from{transform:scale(0)}}
+.hud{display:flex;gap:18px;flex-wrap:wrap;font-weight:700}.hud span b{color:var(--red)}
+pre.res{background:#0b0b11;border-left:3px solid var(--red);padding:14px;font-size:1rem;line-height:1.6;white-space:pre-wrap}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.ex{display:flex;gap:12px;align-items:flex-start}.ex input{width:auto;margin-top:4px}
+.ex.d{opacity:.5;text-decoration:line-through}
+canvas{max-height:240px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:7px;border-bottom:1px solid var(--bd);text-align:left}
+@media(max-width:800px){#burger{display:block}nav{transform:translateX(-100%);width:78%}nav.open{transform:none}main{margin-left:0;padding:16px}.st{display:none}}
+button{min-height:44px}
+.toast{position:fixed;right:16px;bottom:16px;background:var(--card2);border:1px solid var(--red);padding:12px 18px;border-radius:10px;box-shadow:0 0 20px #ff2d4a55;z-index:50;animation:in .3s}
+.ov{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:60;padding:16px}
+body.light{--bg:#f2f2f6;--card:#fff;--card2:#f6f6fa;--tx:#14141c;--mu:#555766;--bd:#d0d0dc}
+body.light header,body.light nav{background:#fffffff0}body.light #arena,body.light input,body.light select,body.light textarea{background:#fff}
+body.noanim *,body.noanim:before{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){*,body:before{animation:none!important;transition:none!important}}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+details summary{cursor:pointer;color:var(--red);margin-top:8px}.av{font-size:2.4rem}
+</style></head><body>
+<header><button id="burger" aria-label="Menu">☰</button><div class="logo">VALO<b>//</b>TRACK</div><div class="sp"></div><div class="st">SYSTÈME EN LIGNE</div><div class="pf" id="pf"></div></header>
+<nav id="nav"></nav><main id="main"></main>
+<script>
+const $=s=>document.querySelector(s),
+L=(k,d)=>{try{return JSON.parse(localStorage.getItem('vt_'+k))??d}catch(e){return d}},
+W=(k,v)=>localStorage.setItem('vt_'+k,JSON.stringify(v)),
+esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const R=[];['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal'].forEach(n=>[1,2,3].forEach(i=>R.push(n+' '+i)));R.push('Radiant');
+const MAPS=['Ascent','Bind','Haven','Split','Icebox','Breeze','Fracture','Pearl','Lotus','Sunset','Abyss'],
+AG=['Jett','Reyna','Phoenix','Raze','Neon','Yoru','Iso','Sage','Skye','Killjoy','Cypher','Sova','Fade','Gekko','Breach','Omen','Brimstone','Viper','Astra','Harbor','Clove','Chamber','Vyse','Tejo','Waylay','Deadlock'];
+let DEMO=L('demo',localStorage.getItem('vt_m')===null),P=L('p',{rank:'Platinum 2',best:'Platinum 2',goal:'Diamond 1',kd:1.18,wr:57,hs:24,acs:238,games:0,agent:'Jett'}),
+M=L('m',demo()),A=L('a',{best:{},prec:0,rt:0,hist:[]}),D=L('d',{}),SES=L('s',null),charts=[],G=null,tm=null;if(DEMO&&localStorage.getItem('vt_m')===null){W('m',M);W('demo',true)}
+const avg=(a,k)=>a.length?a.reduce((s,x)=>s+ +x[k],0)/a.length:0;
+const N=[['dash','Dashboard'],['aim','Aim Trainer'],['stats','Mes statistiques'],['analyse','Analyse'],['coach','Coach'],['maps','Maps'],['agents','Agents'],['sens','Sensibilité'],['train','Entraînement'],['mis','Missions'],['rand','Random'],['prof','Profil'],['cfg','Paramètres']];
+$('#nav').innerHTML=N.map(n=>`<a href="#${n[0]}" data-v="${n[0]}">${n[1]}</a>`).join('');
+$('#burger').onclick=()=>$('#nav').classList.toggle('open');
+const opts=(a,v)=>a.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('');
+function count(){document.querySelectorAll('[data-n]').forEach(e=>{const n=+e.dataset.n,d=+e.dataset.d||0,s=e.dataset.s||'',t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/900);e.textContent=(n*(1-Math.pow(1-p,3))).toFixed(d)+s;if(p<1)requestAnimationFrame(f)})(t0)});setTimeout(()=>document.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%'),60)}
+const bar=w=>`<div class="bar"><i data-w="${Math.max(0,Math.min(100,w)).toFixed(0)}"></i></div>`;
+function advice(p,m){const g=[],b=[];
+ p.hs>=20?g.push('Excellent HS% ('+p.hs+' %) : ton aim est précis.'):p.hs<15?b.push('Travaille ton placement de crosshair.'):b.push('Vise la tête de façon constante : objectif 20 % de HS.');
+ p.kd>=1.1?g.push('K/D solide ('+p.kd+') : tu gagnes tes duels.'):p.kd<1?b.push('Travaille ton positionnement et évite les duels inutiles.'):b.push('Ton K/D est correct : cherche des duels en ta faveur.');
+ p.wr>=55?g.push('Winrate de '+p.wr+' % : tu es régulier.'):p.wr<50?b.push('Analyse tes rounds perdus et ton impact en milieu de partie.'):b.push('Winrate moyen : communique plus et joue les trades.');
+ p.acs>=230?g.push('ACS élevé ('+p.acs+') : fort impact en match.'):p.acs<180&&b.push('ACS faible : cherche plus d\'impact (entry, trades, assists).');
+ if(m.length>=3){const by=(k)=>{const o={};m.forEach(x=>{(o[x[k]]=o[x[k]]||[]).push(x)});return Object.entries(o).filter(e=>e[1].length>=2).map(e=>[e[0],e[1].filter(x=>x.win).length/e[1].length*100,e[1].length])};
+  const am=by('agent').sort((a,b)=>b[1]-a[1]),mp=by('map').sort((a,b)=>b[1]-a[1]);
+  if(am.length)g.push('Meilleur agent : '+am[0][0]+' ('+am[0][1].toFixed(0)+' % de victoires).');
+  if(am.length>1&&am.at(-1)[1]<45)b.push('Agent à retravailler : '+am.at(-1)[0]+' ('+am.at(-1)[1].toFixed(0)+' %).');
+  if(mp.length>1&&mp.at(-1)[1]<45)b.push('Map à éviter ou étudier : '+mp.at(-1)[0]+' ('+mp.at(-1)[1].toFixed(0)+' %).');
+  if(avg(m,'d')>avg(m,'k')+3)b.push('Beaucoup de deaths : joue plus safe sur les premiers contacts.')}
+ return{g,b}}
+function head(t,s){return `<h1>${t}</h1>${s?`<p style="color:var(--mu);margin-top:6px">${s}</p>`:''}`}
+function viewDash(){const a=advice(P,M),ci=R.indexOf(P.rank),gi=R.indexOf(P.goal),pr=gi<=0?100:(ci+1)/(gi+1)*100;
+ const c=(l,v,x)=>`<div class="card"><small>${l}</small><div class="v">${x||v}</div></div>`,n=(l,v,d,s)=>c(l,0,`<span data-n="${v}" data-d="${d}" data-s="${s||''}">0</span>`);
+ return head('Bienvenue sur VALO//TRACK','Ton espace personnel pour analyser, t\'entraîner et progresser sur Valorant.')+
+ `<div class="grid">${c('Rang actuel',P.rank)}${c('Meilleur rang',P.best)}${n('K/D',P.kd,2)}${n('Winrate',P.wr,0,' %')}${n('HS %',P.hs,0,' %')}${n('ACS moyen',P.acs,0)}${n('Parties jouées',P.games,0)}${c('Agent principal',P.agent)}</div>
+ <div class="card"><h3>Progression vers ton objectif</h3><p style="font-size:1.4rem;margin-top:8px">${P.rank} <b style="color:var(--red)">→</b> ${P.goal}</p>${bar(pr)}<small>${pr.toFixed(0)} % du chemin parcouru</small></div>
+ <div class="grid g2"><div class="card"><h3>Tes points forts</h3><ul class="l good">${(a.g.length?a.g:['Joue quelques parties pour révéler tes points forts.']).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+ <div class="card"><h3>À améliorer</h3><ul class="l bad">${(a.b.length?a.b:['Aucun point faible détecté : continue ainsi !']).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>
+ <div class="card"><h3>Modifier mon profil</h3><div class="f">
+ <div><label>Rang actuel</label><select id="p_rank">${opts(R,P.rank)}</select></div><div><label>Meilleur rang</label><select id="p_best">${opts(R,P.best)}</select></div><div><label>Objectif</label><select id="p_goal">${opts(R,P.goal)}</select></div>
+ <div><label>K/D</label><input id="p_kd" type="number" step="0.01" value="${P.kd}"></div><div><label>Winrate %</label><input id="p_wr" type="number" value="${P.wr}"></div><div><label>HS %</label><input id="p_hs" type="number" value="${P.hs}"></div>
+ <div><label>ACS</label><input id="p_acs" type="number" value="${P.acs}"></div><div><label>Parties</label><input id="p_games" type="number" value="${P.games}"></div><div><label>Agent</label><select id="p_agent">${opts(AG,P.agent)}</select></div></div>
+ <button id="psave">Enregistrer</button> <button class="gh" id="psync">Utiliser mes parties saisies</button></div>`}
+function bindDash(){$('#psave').onclick=()=>{['rank','best','goal','agent'].forEach(k=>P[k]=$('#p_'+k).value);['kd','wr','hs','acs','games'].forEach(k=>P[k]=+$('#p_'+k).value||0);W('p',P);go('dash')};
+ $('#psync').onclick=()=>{if(!M.length)return alert('Ajoute d\'abord au moins une partie dans « Mes statistiques ».');const d=avg(M,'d')||1;P.kd=+(avg(M,'k')/d).toFixed(2);P.wr=Math.round(M.filter(x=>x.win).length/M.length*100);P.hs=Math.round(avg(M,'hs'));P.acs=Math.round(avg(M,'acs'));P.games=M.length;W('p',P);go('dash')}}
+/* ---------- AIM ---------- */
+const MODES={30:['30 secondes',1200,44],60:['60 secondes',1200,44],prec:['Précision',700,28],reac:['Réaction',1500,50]};
+function viewAim(){const h=A.hist;return head('Aim Trainer','Clique les cibles le plus vite possible. Les clics dans le vide coûtent des points.')+
+ `<div class="chips" style="margin-top:14px">${Object.entries(MODES).map(([k,v])=>`<button class="gh" data-m="${k}">${v[0]}</button>`).join('')}</div>
+ <div class="hud"><span>Temps <b id="h_t">0</b></span><span>Score <b id="h_s">0</b></span><span>Touchées <b id="h_h">0</b></span></div><div id="arena"><p style="padding:20px;color:var(--mu)">Choisis un mode pour commencer.</p></div><div id="res"></div>
+ <h2 style="margin-top:20px">Historique</h2><div class="grid"><div class="card"><small>Meilleur score</small><div class="v">${Math.max(0,...h.map(x=>x.score))}</div></div><div class="card"><small>Meilleure précision</small><div class="v">${A.prec.toFixed(1)} %</div></div><div class="card"><small>Meilleur temps</small><div class="v">${A.rt?A.rt+' ms':'—'}</div></div></div>
+ <div class="card"><canvas id="c_aim"></canvas></div>`}
+function endAim(){clearInterval(tm);const g=G;G=null;clearTimeout(g.to);$('#arena').innerHTML='';const prec=g.sp?g.hit/g.sp*100:0,rt=g.rt.length?Math.round(g.rt.reduce((a,b)=>a+b)/g.rt.length):0,rec=Math.max(A.best[g.mode]||0,g.score);
+ const newrec=g.score>(A.best[g.mode]||0);A.best[g.mode]=rec;A.prec=Math.max(A.prec,prec);if(rt&&(!A.rt||rt<A.rt))A.rt=rt;A.hist.push({d:new Date().toLocaleDateString('fr-FR'),mode:g.mode,score:g.score,prec:+prec.toFixed(1),rt});A.hist=A.hist.slice(-60);W('a',A);
+ $('#res').innerHTML=`<pre class="res">SESSION TERMINÉE${newrec?'  ★ NOUVEAU RECORD':''}\n\nMode : ${MODES[g.mode][0]}\nScore : ${g.score}\nCibles : ${g.sp}\nTouchées : ${g.hit}\nPrécision : ${prec.toFixed(1)} %\nTemps moyen : ${rt} ms\nRecord personnel : ${rec}</pre>`;go('aim',true)}
+function startAim(mode){if(G)return;const ar=$('#arena');ar.innerHTML='';$('#res').innerHTML='';const dur=mode==='60'?60:30;G={mode,t0:performance.now(),sp:0,hit:0,rt:[],score:0};
+ const upd=()=>{const left=Math.max(0,dur-(performance.now()-G.t0)/1000);$('#h_t').textContent=left.toFixed(1)+'s';$('#h_s').textContent=G.score;$('#h_h').textContent=G.hit;if(left<=0)endAim()};
+ ar.onmousedown=e=>{if(G&&e.target===ar){G.score=Math.max(0,G.score-5);upd()}};tm=setInterval(upd,100);
+ const spawn=()=>{if(!G)return;const[,life,size]=MODES[mode],delay=mode==='reac'?400+Math.random()*1000:80;G.to=setTimeout(()=>{if(!G)return;const t=document.createElement('div');t.className='tg';t.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*(ar.clientWidth-size)}px;top:${Math.random()*(ar.clientHeight-size)}px`;ar.appendChild(t);G.sp++;const born=performance.now();let done=false;
+  const fin=()=>{if(done)return;done=true;clearTimeout(kill);t.remove();spawn()};
+  t.onmousedown=e=>{e.stopPropagation();const r=performance.now()-born;G.hit++;G.rt.push(r);G.score+=10+Math.max(0,Math.round((500-r)/10));upd();fin()};const kill=setTimeout(fin,life)},delay)};spawn()}
+function bindAim(){document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>startAim(b.dataset.m));
+ const h=A.hist;ch('c_aim',h.map(x=>x.d),[{label:'Score',data:h.map(x=>x.score),borderColor:'#ff2d4a',backgroundColor:'#ff2d4a33',fill:true,tension:.3}])}
+/* ---------- STATS ---------- */
+function ch(id,labels,ds){const el=document.getElementById(id);if(!el||typeof Chart==='undefined')return;charts.push(new Chart(el,{type:'line',data:{labels,datasets:ds},options:{plugins:{legend:{labels:{color:'#8b8d9a'}}},scales:{x:{ticks:{color:'#8b8d9a'},grid:{color:'#ffffff0d'}},y:{ticks:{color:'#8b8d9a'},grid:{color:'#ffffff0d'}}}}}))}
+function viewStats(){const w=M.filter(x=>x.win).length,d=avg(M,'d')||1,i=k=>`<div class="card"><small>${k[0]}</small><div class="v">${k[1]}</div></div>`;
+ return head('Mes statistiques','Ajoute tes parties : tout est calculé automatiquement.')+
+ `<div class="card" style="margin-top:14px"><h3>Ajouter une partie</h3><div class="f">
+ <div><label>Date</label><input id="f_date" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div><label>Map</label><select id="f_map">${opts(MAPS)}</select></div><div><label>Agent</label><select id="f_agent">${opts(AG,P.agent)}</select></div><div><label>Résultat</label><select id="f_win"><option value="1">Victoire</option><option value="0">Défaite</option></select></div>
+ <div><label>Kills</label><input id="f_k" type="number" min="0" value="15"></div><div><label>Deaths</label><input id="f_d" type="number" min="0" value="12"></div><div><label>Assists</label><input id="f_a" type="number" min="0" value="5"></div><div><label>ACS</label><input id="f_acs" type="number" min="0" value="230"></div><div><label>HS %</label><input id="f_hs" type="number" min="0" max="100" value="22"></div><div><label>Score du match</label><input id="f_sc" placeholder="13-9"></div></div>
+ <label>Commentaire</label><textarea id="f_c" rows="2"></textarea><br><br><button id="fadd">Ajouter la partie</button></div>
+ <div class="grid">${i(['K/D',(avg(M,'k')/d).toFixed(2)])}${i(['Winrate',(M.length?w/M.length*100:0).toFixed(0)+' %'])}${i(['Kills moy.',avg(M,'k').toFixed(1)])}${i(['Deaths moy.',avg(M,'d').toFixed(1)])}${i(['Assists moy.',avg(M,'a').toFixed(1)])}${i(['ACS moy.',avg(M,'acs').toFixed(0)])}${i(['HS % moy.',avg(M,'hs').toFixed(1)+' %'])}${i(['Parties',M.length])}</div>
+ <div class="grid g2"><div class="card"><h3>Évolution du K/D</h3><canvas id="c1"></canvas></div><div class="card"><h3>Évolution du HS%</h3><canvas id="c2"></canvas></div><div class="card"><h3>Évolution de l'ACS</h3><canvas id="c3"></canvas></div><div class="card"><h3>Winrate</h3><canvas id="c4"></canvas></div></div>
+ <div class="card" style="overflow:auto"><h3>Historique</h3><table><tr><th>Date</th><th>Map</th><th>Agent</th><th></th><th>K/D/A</th><th>ACS</th><th>Commentaire</th><th></th></tr>${M.map((x,j)=>`<tr><td>${x.date}</td><td>${x.map}</td><td>${x.agent}</td><td style="color:${x.win?'var(--ok)':'var(--red)'}">${x.win?'V':'D'} ${esc(x.sc)}</td><td>${x.k}/${x.d}/${x.a}</td><td>${x.acs}</td><td>${esc(x.c)}</td><td><button class="gh" data-del="${j}">✕</button></td></tr>`).join('')||'<tr><td colspan="8">Aucune partie enregistrée.</td></tr>'}</table></div>`}
+function bindStats(){$('#fadd').onclick=()=>{const v=id=>$('#f_'+id).value;if(!v('date'))return alert('Choisis une date.');M.push({date:v('date'),map:v('map'),agent:v('agent'),win:v('win')==='1',k:+v('k')||0,d:+v('d')||0,a:+v('a')||0,acs:+v('acs')||0,hs:+v('hs')||0,sc:v('sc'),c:v('c')});M.sort((a,b)=>a.date.localeCompare(b.date));W('m',M);toast('Partie ajoutée');go('stats',true)};
+ document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{M.splice(+b.dataset.del,1);W('m',M);go('stats',true)});
+ const lb=M.map(x=>x.date.slice(5)),mk=(l,data)=>[{label:l,data,borderColor:'#ff2d4a',backgroundColor:'#ff2d4a33',fill:true,tension:.3}];let wins=0;
+ ch('c1',lb,mk('K/D',M.map(x=>+(x.k/(x.d||1)).toFixed(2))));ch('c2',lb,mk('HS %',M.map(x=>x.hs)));ch('c3',lb,mk('ACS',M.map(x=>x.acs)));ch('c4',lb,mk('Winrate cumulé %',M.map((x,i)=>{wins+=x.win?1:0;return Math.round(wins/(i+1)*100)})))}
+/* ---------- ANALYSE ---------- */
+function viewAnalyse(){const d=M.length?{kd:avg(M,'k')/(avg(M,'d')||1),hs:avg(M,'hs'),wr:M.filter(x=>x.win).length/M.length*100}:{kd:P.kd,hs:P.hs,wr:P.wr},a=advice({...P,kd:+d.kd.toFixed(2),hs:Math.round(d.hs),wr:Math.round(d.wr)},M);
+ const row=(t,l,w)=>`<div class="card"><h3>${t}</h3><p>${l}</p>${bar(w)}</div>`;
+ const grp=k=>{const o={};M.forEach(x=>{(o[x[k]]=o[x[k]]||[]).push(x)});return Object.entries(o).map(([n,a])=>`<tr><td>${n}</td><td>${a.length}</td><td>${(a.filter(x=>x.win).length/a.length*100).toFixed(0)} %</td><td>${(avg(a,'k')/(avg(a,'d')||1)).toFixed(2)}</td></tr>`).join('')||'<tr><td colspan="4">Pas encore de données.</td></tr>'};
+ return head('Analyse de tes performances',M.length?'Basée sur tes '+M.length+' parties.':'Basée sur ton profil (ajoute des parties pour affiner).')+
+ `<div class="grid g2" style="margin-top:14px">${row('Aim','HS % : '+d.hs.toFixed(0)+' %',d.hs/30*100)}${row('Survie','K/D : '+d.kd.toFixed(2),d.kd/1.5*100)}${row('Régularité','Winrate : '+d.wr.toFixed(0)+' %',d.wr/65*100)}</div>
+ <div class="grid g2"><div class="card"><h3>Conseils personnalisés</h3><ul class="l bad">${(a.b.length?a.b:['Rien à signaler, continue !']).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div><div class="card"><h3>Points forts</h3><ul class="l good">${(a.g.length?a.g:['—']).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div>
+ <div class="grid g2"><div class="card"><h3>Par map</h3><table><tr><th>Map</th><th>N</th><th>WR</th><th>K/D</th></tr>${grp('map')}</table></div><div class="card"><h3>Par agent</h3><table><tr><th>Agent</th><th>N</th><th>WR</th><th>K/D</th></tr>${grp('agent')}</table></div></div>`}
+/* ---------- COACH ---------- */
+const C={
+'Aim':['Gagner en précision et en régularité.','Sensibilité trop haute, crispation, pas d\'échauffement.',['10 min d\'Aim Trainer (mode précision)','5 min Deathmatch Vandal','Pauses de 2 min pour relâcher la main'],'20 min / jour'],
+'Crosshair placement':['Garder constamment le viseur à hauteur de tête.','Viser le sol en courant, regarder le mur au lieu de l\'angle.',['10 min Deathmatch','Vandal uniquement','Ne pas tirer avant d\'être correctement arrêté','Observer les angles avant de déplacer le crosshair'],'15 min / jour'],
+'Movement':['Être imprévisible et difficile à toucher.','Mouvements prévisibles, strafe sans arrêt avant de tirer.',['5 min de peeks en Practice Range','Jiggle-peek sur chaque angle','Alterner shoulder peek et wide swing'],'10 min / jour'],
+'Counter-strafe':['Tirer parfaitement arrêté pour être précis.','Tirer en mouvement, double appui sur la touche inverse.',['Practice Range : bots, 1 balle par arrêt','Compter à voix haute : strafe → stop → tap','Répéter avec Vandal puis Sheriff'],'10 min / jour'],
+'Game sense':['Anticiper les actions adverses.','Ne pas regarder la minimap, jouer sans info.',['Regarder 1 VOD pro en prédisant les rotations','Noter le timing de chaque round','Après chaque mort : où est l\'ennemi probable ?'],'20 min / jour'],
+'Positionnement':['Prendre des duels avantageux avec un repli.','Se placer à découvert, jouer seul loin de l\'équipe.',['Analyser 3 morts de ta dernière partie','Tester 2 positions off-angle par map','Toujours avoir un repli ou un trade'],'15 min / jour'],
+'Communication':['Informer l\'équipe de façon claire et brève.','Trop de bavardage, infos sans localisation.',['Format : nombre + lieu + HP','Annoncer chaque utilité utilisée','Rester calme, jamais de reproches'],'À chaque partie'],
+'Clutch':['Garder la tête froide en infériorité.','Se précipiter, faire du bruit, prendre un 1v1 en face.',['Utiliser le temps du round, isoler les duels','Jouer au son : couteau sorti, pas de bruit','Se rejouer 3 clutchs en VOD'],'15 min / semaine'],
+'Économie':['Maximiser les rounds forts.','Force-buy isolé, acheter sans l\'équipe.',['Apprendre les seuils : full buy à ~3900 crédits','Acheter ensemble, drop pour les coéquipiers','Sauver une arme sur les rounds perdus'],'10 min d\'étude'],
+'Gestion des rounds':['Garder une stratégie cohérente sur la durée.','Enchaîner les mêmes actions, pas d\'adaptation.',['Noter le pattern adverse après 3 rounds','Changer de site / rythme tous les 2 rounds','Garder des utilités pour le post-plant'],'À chaque partie'],
+'Gestion du stress':['Rester performant sous pression.','Tilt après une mort, jouer fatigué.',['Respiration 4-4-4 entre les rounds','Pause de 5 min après 2 défaites','Ne jouer que si tu es reposé'],'5 min / jour']};
+let cs=Object.keys(C)[0];
+function viewCoach(){const c=C[cs];return head('Coach','Choisis ton point à travailler.')+`<div class="chips" style="margin:14px 0">${Object.keys(C).map(k=>`<button class="gh ${k==cs?'on':''}" data-c="${k}">${k}</button>`).join('')}</div>
+ <div class="card"><h2 style="color:var(--red)">${cs}</h2><p style="margin:10px 0"><b>Objectif :</b> ${c[0]}</p><p><b>Erreurs fréquentes :</b> ${c[1]}</p><p style="margin:10px 0"><b>Durée recommandée :</b> ${c[3]}</p><h3>Entraînement</h3>${c[2].map((e,i)=>`<label class="ex" style="display:flex;padding:7px 0;text-transform:none;font-size:.95rem;color:var(--tx)"><input type="checkbox" data-k="co:${cs}:${i}" ${D['co:'+cs+':'+i]?'checked':''}>${i+1}. ${e}</label>`).join('')}
+ <label class="ex" style="margin-top:12px;text-transform:none;font-size:1rem;color:var(--ok)"><input type="checkbox" data-k="co:${cs}:all" ${D['co:'+cs+':all']?'checked':''}>Exercice terminé</label></div>`}
+/* ---------- TRAIN ---------- */
+const POOL=[['Aim Trainer','Mode précision puis réaction sur VALO//TRACK.'],['Deathmatch','Vandal uniquement, viseur à hauteur de tête.'],['Counter-strafe','Practice Range : stop complet avant chaque tir.'],['VOD review','Revois 2 morts et note l\'erreur.'],['Crosshair placement','Parcours une map en pré-visant chaque angle.'],['Movement','Jiggle-peek et shoulder peek sur bots.'],['Utilités','Lineups de ton agent principal.'],['Échauffement mental','Respiration et objectif de la session.']];
+function viewTrain(){const s=SES;return head('Entraînement','Génère une session adaptée à ton temps disponible.')+
+ `<div class="card" style="margin-top:14px"><div class="f"><div><label>Durée (min)</label><select id="t_dur">${[15,20,30,45,60].map(x=>`<option ${s&&s.dur==x?'selected':''}>${x}</option>`).join('')}</select></div></div><button id="tgen">Générer ma session</button></div>
+ ${s?`<div class="card" style="margin-top:14px"><h2>Session du jour · ${s.dur} min</h2><b id="pct"></b><div class="bar"><i id="pbar" data-w="0"></i></div>${s.ex.map((e,i)=>`<label class="ex" style="display:flex;padding:10px 0;border-bottom:1px solid var(--bd);text-transform:none;color:var(--tx);font-size:1rem"><input type="checkbox" data-k="s:${i}" ${D['s:'+i]?'checked':''}><span><b style="color:var(--red)">${e[2]} min</b> — ${e[0].toUpperCase()}<br><small style="color:var(--mu)">${e[1]}</small></span></label>`).join('')}</div>`:''}`}
+function bindTrain(){$('#tgen').onclick=()=>{const dur=+$('#t_dur').value,n=Math.max(3,Math.round(dur/10)+1),pick=[...POOL].sort(()=>Math.random()-.5).slice(0,n);let left=dur;const ex=pick.map((p,i)=>{const m=i===n-1?left:Math.max(5,Math.round(dur/n/5)*5);left-=m;return[p[0],p[1],m]}).filter(e=>e[2]>0);
+ Object.keys(D).filter(k=>k.startsWith('s:')).forEach(k=>delete D[k]);W('d',D);SES={dur,ex};W('s',SES);go('train',true)}}
+/* ---------- ROUTER ---------- */
+const V={dash:[viewDash,bindDash],aim:[viewAim,bindAim],stats:[viewStats,bindStats],analyse:[viewAnalyse],coach:[viewCoach,()=>document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{cs=b.dataset.c;go('coach',true)})],train:[viewTrain,bindTrain]};
+/* ---------- OUTILS UI : réglages, toasts, modales ---------- */
+const $$=s=>document.querySelectorAll(s);
+let S=L('st',{theme:'dark',anim:true,snd:false});
+function applyS(){document.body.classList.toggle('light',S.theme==='light');document.body.classList.toggle('noanim',!S.anim)}applyS();
+function beep(){if(!S.snd)return;try{const c=new AudioContext(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=660;g.gain.value=.05;o.start();o.stop(c.currentTime+.08)}catch(e){}}
+function toast(m){const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=m;document.body.appendChild(t);beep();setTimeout(()=>t.remove(),2600)}
+function modal(m,fn){const o=document.createElement('div');o.className='ov';o.innerHTML=`<div class="card" role="dialog" aria-modal="true"><p>${m}</p><br><button id="mo">Confirmer</button> <button class="gh" id="mc">Annuler</button></div>`;document.body.appendChild(o);$('#mc').onclick=()=>o.remove();$('#mo').onclick=()=>{o.remove();fn()};$('#mo').focus()}
+function wipe(){Object.keys(localStorage).filter(k=>k.startsWith('vt_')).forEach(k=>localStorage.removeItem(k))}
+function own(){wipe();W('m',[]);W('demo',false);location.reload()}
+function demo(){const a=['Jett','Omen','Sage'],m=['Ascent','Bind','Haven','Split'];return Array.from({length:8},(_,i)=>({date:'2026-09-'+String(10+i*2).padStart(2,'0'),map:m[i%4],agent:a[i%3],win:i%3!==2,k:14+(i*3)%9,d:11+(i*5)%7,a:4+i%5,acs:215+i*6,hs:20+i%6,sc:i%3!==2?'13-9':'8-13',c:'Démo'}))}
+function tp(){const e=$('#pct');if(!e||!SES)return;const p=Math.round(SES.ex.filter((_,i)=>D['s:'+i]).length/SES.ex.length*100),b=$('#pbar');e.textContent=p+' % terminé';b.dataset.w=p;b.style.width=p+'%'}
+/* ---------- SENSIBILITÉ ---------- */
+let SN=L('sn',[]);const cm=(d,s)=>360/(d*s*0.07)*2.54;
+function viewSens(){return head('Sensibilité','Calcule ton eDPI et ta distance de rotation (cm/360°).')+`<div class="card" style="margin-top:14px"><div class="f"><div><label for="s_d">DPI</label><input id="s_d" type="number" min="100" value="${P.dpi||800}"></div><div><label for="s_s">Sensibilité Valorant</label><input id="s_s" type="number" step="0.01" min="0.01" value="${P.sens||0.35}"></div></div><pre class="res" id="s_o"></pre><button id="s_sv">Sauvegarder cette sensibilité</button></div>
+<div class="card" style="margin-top:14px"><h3>Historique</h3><ul class="l">${SN.map(x=>`<li>${x.dpi} DPI / ${x.sens}<br>eDPI : ${(x.dpi*x.sens).toFixed(0)} · ${cm(x.dpi,x.sens).toFixed(1)} cm/360°</li>`).reverse().join('')||'<li>Aucune sensibilité sauvegardée.</li>'}</ul></div>`}
+function bindSens(){const up=()=>{const d=+$('#s_d').value,s=+$('#s_s').value,l=SN.at(-1);$('#s_o').textContent=d>0&&s>0?`eDPI : ${(d*s).toFixed(0)}\ncm/360° : ${cm(d,s).toFixed(1)}`+(l?`\nvs précédente (${l.dpi}/${l.sens}) : ${((d*s/(l.dpi*l.sens)-1)*100).toFixed(1)} % d'eDPI`:''):'Saisis des valeurs valides.'};
+ $('#s_d').oninput=$('#s_s').oninput=up;up();$('#s_sv').onclick=()=>{const d=+$('#s_d').value,s=+$('#s_s').value;if(!(d>0&&s>0))return toast('Valeurs invalides');SN.push({dpi:d,sens:s});P.dpi=d;P.sens=s;W('sn',SN);W('p',P);toast('Sensibilité sauvegardée');go('sens',true)}}
+/* ---------- MAPS (images/lineups : ajouter les champs img et lineups dans MP) ---------- */
+let MN=L('mn',{}),mf='Toutes';
+const MP=[['Ascent','A, B','Mid avec portes que l\'on peut fermer.'],['Bind','A, B','Deux téléporteurs à sens unique, pas de mid.'],['Haven','A, B, C','Trois sites à défendre.'],['Split','A, B','Mid vertical avec des cordes.'],['Lotus','A, B, C','Trois sites, portes tournantes, murs destructibles.'],['Sunset','A, B','Deux sites autour d\'un mid contrôlable.'],['Icebox','A, B','Forte verticalité, tyroliennes.'],['Breeze','A, B','Grands espaces, duels longue portée.'],['Abyss','A, B','Bords sans garde-corps : attention aux chutes.'],['Pearl','A, B','Deux sites, sans gadget particulier.'],['Fracture','A, B','Les attaquants arrivent des deux côtés.']];
+const MT={Attaque:'Prends de l\'info, crée de l\'espace, puis engage avec utilités.',Défense:'Varie tes positions et garde un repli pour le retake.',Lineups:'Note tes lineups dans la zone de notes de la carte.',Smokes:'Coupe les angles dangereux et la vue longue portée.',Flashs:'Flashe pour ton coéquipier et swing juste après.'};
+function viewMaps(){return head('Maps','Explore les maps et garde tes callouts et lineups dans tes notes.')+`<div class="chips" style="margin:14px 0">${['Toutes',...Object.keys(MT)].map(f=>`<button class="gh ${f==mf?'on':''}" data-f="${f}" aria-pressed="${f==mf}">${f}</button>`).join('')}</div><div class="grid g2">${MP.map(m=>`<div class="card"><h2>${m[0]}</h2><p>${m[2]}</p><p><b>Sites :</b> ${m[1]}</p>${mf=='Toutes'?`<p><b>Attaque :</b> ${MT.Attaque}</p><p><b>Défense :</b> ${MT.Défense}</p>`:`<p><b>${mf} :</b> ${MT[mf]}</p>`}<label for="n_${m[0]}">Mes callouts / lineups</label><textarea id="n_${m[0]}" data-n="${m[0]}" rows="3">${esc(MN[m[0]]||'')}</textarea></div>`).join('')}</div>`}
+function bindMaps(){$$('[data-f]').forEach(b=>b.onclick=()=>{mf=b.dataset.f;go('maps',true)});$$('[data-n]').forEach(t=>t.onchange=()=>{MN[t.dataset.n]=t.value;W('mn',MN);toast('Notes enregistrées')})}
+/* ---------- AGENTS ---------- */
+const AGS=`Jett|Duelist|Cloudburst, Updraft, Tailwind, Blade Storm
+Reyna|Duelist|Leer, Devour, Dismiss, Empress
+Phoenix|Duelist|Blaze, Curveball, Hot Hands, Run it Back
+Raze|Duelist|Boom Bot, Blast Pack, Paint Shells, Showstopper
+Yoru|Duelist|Fakeout, Blindside, Gatecrash, Dimensional Drift
+Neon|Duelist|Fast Lane, Relay Bolt, High Gear, Overdrive
+Iso|Duelist|Undercut, Double Tap, Contingency, Kill Contract
+Waylay|Duelist|Saturate, Lightspeed, Refract, Convergent Paths
+Sova|Initiator|Owl Drone, Shock Bolt, Recon Bolt, Hunter's Fury
+Breach|Initiator|Aftershock, Flashpoint, Fault Line, Rolling Thunder
+Skye|Initiator|Regrowth, Trailblazer, Guiding Light, Seekers
+Kay/O|Initiator|FLASH/drive, ZERO/point, FRAG/ment, NULL/cmd
+Fade|Initiator|Prowler, Seize, Haunt, Nightfall
+Gekko|Initiator|Wingman, Dizzy, Mosh Pit, Thrash
+Tejo|Initiator|Stealth Drone, Special Delivery, Guided Salvo, Armageddon
+Omen|Controller|Paranoia, Dark Cover, Shrouded Step, From the Shadows
+Brimstone|Controller|Incendiary, Sky Smoke, Stim Beacon, Orbital Strike
+Viper|Controller|Snake Bite, Poison Cloud, Toxic Screen, Viper's Pit
+Astra|Controller|Nova Pulse, Nebula, Gravity Well, Cosmic Divide
+Harbor|Controller|Cascade, Cove, High Tide, Reckoning
+Clove|Controller|Pick-me-up, Meddle, Ruse, Not Dead Yet
+Sage|Sentinel|Slow Orb, Healing Orb, Barrier Orb, Resurrection
+Cypher|Sentinel|Trapwire, Cyber Cage, Spycam, Neural Theft
+Killjoy|Sentinel|Alarmbot, Turret, Nanoswarm, Lockdown
+Chamber|Sentinel|Trademark, Headhunter, Rendezvous, Tour de Force
+Deadlock|Sentinel|GravNet, Sonic Sensor, Barrier Mesh, Annihilation
+Vyse|Sentinel|Razorvine, Shear, Arc Rose, Steel Garden`.split('\n').map(l=>l.split('|'));
+const RI={Duelist:['Ouvre les sites et crée de l\'espace.','Impact en entry, potentiel de frags.','Dépend des flashs et des trades.','Entre en second avec un coéquipier, pas seul.'],Initiator:['Récolte l\'info et prépare l\'entrée.','Utilités qui facilitent les duels.','Peu de soin et d\'autonomie.','Utilise tes capacités juste avant l\'engagement.'],Controller:['Contrôle la vision avec des écrans.','Découpe les angles, gère le rythme.','Moins de frags directs.','Place tes écrans tôt et reste avec l\'équipe.'],Sentinel:['Verrouille un site et protège les flancs.','Info passive, bon en défense.','Moins mobile en attaque.','Change tes installations d\'un round à l\'autre.']};
+let ar='Tous',aq='';
+function viewAgents(){const l=AGS.filter(a=>(ar=='Tous'||a[1]==ar)&&a[0].toLowerCase().includes(aq.toLowerCase()));return head('Agents','Fiches, compétences et conseils par rôle.')+`<div class="chips" style="margin:14px 0">${['Tous',...Object.keys(RI)].map(r=>`<button class="gh ${r==ar?'on':''}" data-r="${r}" aria-pressed="${r==ar}">${r}</button>`).join('')}</div><label for="aq">Rechercher un agent...</label><input id="aq" placeholder="Rechercher un agent..." value="${esc(aq)}"><div class="grid">${l.map(a=>{const r=RI[a[1]];return `<div class="card"><h3>${a[0]}</h3><small>${a[1]}</small><p style="margin:8px 0"><b>Compétences :</b> ${a[2]}</p><details><summary>Détails</summary><p><b>Style :</b> ${r[0]}</p><p><b>Forces :</b> ${r[1]}</p><p><b>Faiblesses :</b> ${r[2]}</p><p><b>Conseil :</b> ${r[3]}</p></details></div>`}).join('')||'<p>Aucun agent trouvé.</p>'}</div>`}
+function bindAgents(){$$('[data-r]').forEach(b=>b.onclick=()=>{ar=b.dataset.r;go('agents',true)});$('#aq').oninput=e=>{aq=e.target.value;const p=e.target.selectionStart;go('agents',true);const i=$('#aq');i.focus();i.setSelectionRange(p,p)}}
+/* ---------- MISSIONS ---------- */
+let Q=L('q',{xp:0,done:{}});const MI=[['Faire 2 Deathmatch',100],['Faire 20 minutes d\'Aim Trainer',150],['Jouer 3 parties',200],['Ajouter 3 parties au tracker',150],['Faire une session d\'entraînement',120],['Améliorer son record d\'Aim Trainer',250],['Faire une VOD review',150]];
+function viewMis(){const lv=Math.floor(Q.xp/2000)+1,x=Q.xp%2000;return head('Missions','Valide tes missions pour gagner de l\'XP.')+`<div class="card" style="margin:14px 0"><h2>Niveau ${lv}</h2><p>${x} / 2000 XP</p>${bar(x/20)}</div><div class="card">${MI.map((m,i)=>`<div class="ex" style="justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)"><span>${Q.done[i]?'✔ ':''}${m[0]} <b style="color:var(--red)">+${m[1]} XP</b></span><button class="gh" data-q="${i}" ${Q.done[i]?'disabled':''}>${Q.done[i]?'Fait':'Valider'}</button></div>`).join('')}<br><button class="gh" id="qr">Nouvelle journée</button></div>`}
+function bindMis(){$$('[data-q]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q,l=Math.floor(Q.xp/2000);Q.done[i]=1;Q.xp+=MI[i][1];W('q',Q);toast('+'+MI[i][1]+' XP');if(Math.floor(Q.xp/2000)>l)toast('Niveau '+(l+2)+' débloqué !');go('mis',true)});$('#qr').onclick=()=>{Q.done={};W('q',Q);go('mis',true)}}
+/* ---------- RANDOM ---------- */
+const DF=['Faire 10 kills avec une arme secondaire','Faire 3 kills en headshot dans un round','Gagner un round sans utiliser de capacité offensive','Faire une partie avec un agent différent','Ne jamais courir en tirant pendant une partie','Faire un round en utilisant uniquement le couteau pour te déplacer','Annoncer toutes les infos à ton équipe pendant 3 rounds','Gagner un pistol round'];
+function spin(list,el){let n=0;const t=setInterval(()=>{el.textContent=list[Math.random()*list.length|0];if(++n>16){clearInterval(t);toast('Tirage : '+el.textContent)}},70)}
+function viewRand(){return head('Random','Laisse le hasard décider.')+`<div class="grid g2" style="margin-top:14px"><div class="card"><h3>Random agent</h3><p style="font-size:1.4rem">Ton agent</p><p class="v" style="color:var(--red)" id="ra" aria-live="polite">—</p><button id="rab">Choisir un agent</button></div><div class="card"><h3>Random map</h3><p style="font-size:1.4rem">Ta map</p><p class="v" style="color:var(--red)" id="rm" aria-live="polite">—</p><button id="rmb">Choisir une map</button></div><div class="card"><h3>Défi du jour</h3><p class="v" style="font-size:1.2rem" id="rd">${DF[new Date().getDate()%DF.length]}</p><button id="rdb">Nouveau défi</button></div></div>`}
+function bindRand(){$('#rab').onclick=()=>spin(AGS.map(a=>a[0]),$('#ra'));$('#rmb').onclick=()=>spin(MP.map(m=>m[0]),$('#rm'));$('#rdb').onclick=()=>{$('#rd').textContent=DF[Math.random()*DF.length|0]}}
+/* ---------- PROFIL ---------- */
+const AVS=['🎯','🔥','⚡','🛡️','👑','🐺'];
+function viewProf(){const av=P.avatar||AVS[0];return head('Profil')+`<div class="grid g2" style="margin-top:14px"><div class="card"><h3>Informations</h3><div class="f"><div><label for="q_name">Pseudo</label><input id="q_name" value="${esc(P.name||'JOUEUR')}" maxlength="20"></div><div><label for="q_rank">Rang</label><select id="q_rank">${opts(R,P.rank)}</select></div><div><label for="q_goal">Objectif</label><select id="q_goal">${opts(R,P.goal)}</select></div><div><label for="q_agent">Agent principal</label><select id="q_agent">${opts(AG,P.agent)}</select></div><div><label for="q_role">Rôle principal</label><select id="q_role">${opts(Object.keys(RI),P.role||'Duelist')}</select></div><div><label for="q_dpi">DPI</label><input id="q_dpi" type="number" value="${P.dpi||800}"></div><div><label for="q_sens">Sensibilité</label><input id="q_sens" type="number" step="0.01" value="${P.sens||0.35}"></div></div><p>Avatar</p><div class="chips">${AVS.map(a=>`<button class="gh av ${a==av?'on':''}" data-av="${a}" aria-label="Avatar ${a}" aria-pressed="${a==av}">${a}</button>`).join('')}</div><br><button id="qsave">Enregistrer</button></div>
+<div class="card"><span class="av">${av}</span><pre class="res">${esc((P.name||'JOUEUR').toUpperCase())}\n\n${P.rank}\n\nObjectif :\n${P.goal}\n\nMain :\n${P.agent}\n\nK/D :\n${P.kd}\n\nHS :\n${P.hs} %</pre></div></div>`}
+function bindProf(){$$('[data-av]').forEach(b=>b.onclick=()=>{P.avatar=b.dataset.av;W('p',P);go('prof',true)});$('#qsave').onclick=()=>{['name','rank','goal','agent','role'].forEach(k=>P[k]=$('#q_'+k).value.trim()||P[k]);P.dpi=+$('#q_dpi').value||800;P.sens=+$('#q_sens').value||0.35;W('p',P);toast('Profil enregistré');go('prof',true)}}
+/* ---------- PARAMÈTRES ---------- */
+function viewCfg(){const cb=(k,l,on)=>`<label class="ex" style="display:flex;padding:8px 0;text-transform:none;font-size:1rem;color:var(--tx)"><input type="checkbox" data-s="${k}" ${on?'checked':''}>${l}</label>`;return head('Paramètres')+`<div class="card" style="margin-top:14px"><h3>Affichage</h3>${cb('theme','Thème clair',S.theme==='light')}${cb('anim','Animations',S.anim)}${cb('snd','Sons',S.snd)}<small>Les animations sont aussi désactivées si ton système demande de les réduire.</small></div>
+<div class="card" style="margin-top:14px"><h3>Données</h3><button id="cx">Exporter mes données</button> <button class="gh" id="ci">Importer mes données</button> <button class="gh" id="cr">Réinitialiser mes données</button><input type="file" id="imp" accept=".json" hidden aria-label="Fichier JSON à importer"></div>`}
+function bindCfg(){$$('[data-s]').forEach(c=>c.onchange=()=>{const k=c.dataset.s;if(k=='theme')S.theme=c.checked?'light':'dark';else S[k]=c.checked;W('st',S);applyS();toast('Réglage enregistré')});
+ $('#cx').onclick=()=>{const o={};Object.keys(localStorage).filter(k=>k.startsWith('vt_')).forEach(k=>o[k]=localStorage.getItem(k));const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download='valotrack-export.json';a.click();toast('Export téléchargé')};
+ $('#ci').onclick=()=>$('#imp').click();$('#imp').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||typeof o!='object')throw 0;wipe();Object.entries(o).forEach(([k,v])=>{if(k.startsWith('vt_'))localStorage.setItem(k,String(v))});W('demo',false);location.reload()}catch(x){toast('Fichier invalide')}};r.readAsText(f)};
+ $('#cr').onclick=()=>modal('Supprimer toutes tes données ? Cette action est définitive.',own)}
+Object.assign(V,{maps:[viewMaps,bindMaps],agents:[viewAgents,bindAgents],sens:[viewSens,bindSens],mis:[viewMis,bindMis],rand:[viewRand,bindRand],prof:[viewProf,bindProf],cfg:[viewCfg,bindCfg]});
+
+let cur='dash';
+function go(v,keep){if(!V[v])v='dash';if(G&&!keep){clearInterval(tm);clearTimeout(G.to);G=null}cur=v;charts.forEach(c=>c.destroy());charts=[];
+ const keepRes=keep&&v==='aim'&&$('#res')?$('#res').innerHTML:'';
+ $('#main').innerHTML=`<section>${V[v][0]()}</section>`;if(V[v][1])V[v][1]();if(DEMO){$('#main').insertAdjacentHTML('afterbegin','<div class="card" style="margin-bottom:14px"><b>Données de démonstration.</b> Ces statistiques sont fictives. <button id="own">Utiliser mes propres données</button></div>');$('#own').onclick=()=>modal('Repartir avec des données vierges ?',own)}
+ document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===v));$('#nav').classList.remove('open');
+ $('#pf').textContent=(P.avatar||'👤')+' '+(P.name||'JOUEUR')+' · '+P.rank;tp();if(keepRes)$('#res').innerHTML=keepRes;
+ document.querySelectorAll('[data-k]').forEach(c=>c.onchange=()=>{D[c.dataset.k]=c.checked;W('d',D);c.closest('.ex').classList.toggle('d',c.checked);tp()});
+ document.querySelectorAll('[data-k]').forEach(c=>c.closest('.ex').classList.toggle('d',c.checked));count();if(location.hash!=='#'+v)history.replaceState(null,'','#'+v)}
+addEventListener('hashchange',()=>go(location.hash.slice(1)));
+go(location.hash.slice(1)||'dash');
+</script></body></html>
